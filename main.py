@@ -71,14 +71,18 @@ def collect_data(content_type, content_name, max_comments):
         
         # 保存数据
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"{content_name}_{content_type}_{timestamp}"
+        filename = f"{content_name}_{content_type}_{timestamp}.txt"
         filepath = crawler.save_comments(filename)
         
-        print(f"\n数据收集完成！")
-        print(f"共收集到 {len(comments)} 条评论")
-        print(f"数据已保存到: {filepath}")
-        
-        return filepath
+        if filepath:
+            print(f"\n数据收集完成！")
+            print(f"共收集到 {len(comments)} 条评论")
+            print(f"数据已保存到: {filepath}")
+            
+            return filepath
+        else:
+            print("数据保存失败")
+            return None
         
     except Exception as e:
         print(f"数据收集过程中出现错误: {e}")

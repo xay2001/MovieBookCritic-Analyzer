@@ -274,30 +274,20 @@ class DoubanCrawler:
     def _get_comments_url(self, content_url):
         """获取评论页面URL"""
         try:
-            self.driver.get(content_url)
-            self._random_delay()
-            
-            # 查找评论链接
-            try:
-                comments_link = self.driver.find_element(By.CSS_SELECTOR, '.reviews-mod-more a, #comments-section a')
-                comments_url = comments_link.get_attribute('href')
-                print(f"找到评论页面: {comments_url}")
-                return comments_url
-            except NoSuchElementException:
-                # 如果找不到评论链接，尝试直接构建
-                if self.content_type == 'movie':
-                    movie_id = re.search(r'/subject/(\d+)/', content_url)
-                    if movie_id:
-                        comments_url = f"{DOUBAN_CONFIG['movie_base_url']}/subject/{movie_id.group(1)}/comments"
-                        return comments_url
-                else:
-                    book_id = re.search(r'/subject/(\d+)/', content_url)
-                    if book_id:
-                        comments_url = f"{DOUBAN_CONFIG['book_base_url']}/subject/{book_id.group(1)}/comments"
-                        return comments_url
-                        
-                print("无法找到评论页面")
+            # 从内容URL提取ID
+            content_id = re.search(r'/subject/(\d+)/', content_url)
+            if not content_id:
+                print("无法从URL中提取内容ID")
                 return None
+                
+            # 根据内容类型构建评论页面URL
+            if self.content_type == 'movie':
+                comments_url = DOUBAN_CONFIG['movie_comments_url'].format(content_id.group(1))
+            else:
+                comments_url = DOUBAN_CONFIG['book_comments_url'].format(content_id.group(1))
+                
+            print(f"找到评论页面: {comments_url}")
+            return comments_url
                 
         except Exception as e:
             print(f"获取评论页面URL时出错: {e}")
@@ -313,6 +303,10 @@ class DoubanCrawler:
         try:
             # 确保data目录存在
             os.makedirs('data', exist_ok=True)
+            
+            # 确保文件名有正确的扩展名
+            if not filename.endswith('.txt'):
+                filename = f"{filename}.txt"
             
             filepath = os.path.join('data', filename)
             
@@ -334,8 +328,11 @@ class DoubanCrawler:
             print(f"评论已保存到: {filepath}")
             print(f"JSON格式已保存到: {json_filepath}")
             
+            return filepath
+            
         except Exception as e:
             print(f"保存评论时出错: {e}")
+            return None
 
 
 def main():
@@ -343,7 +340,9 @@ def main():
     crawler = DoubanCrawler(content_type='movie', max_comments=100)
     comments = crawler.crawl_comments('肖申克的救赎')
     if comments:
-        crawler.save_comments('肖申克的救赎.txt')
+        filepath = crawler.save_comments('肖申克的救赎')
+        if filepath:
+            print(f"评论已保存到: {filepath}")
 
 
 if __name__ == '__main__':

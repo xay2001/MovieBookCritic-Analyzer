@@ -32,6 +32,8 @@ DOUBAN_CONFIG = {
     'book_search_url': 'https://book.douban.com/subject_search?search_text={}',
     'movie_base_url': 'https://movie.douban.com',
     'book_base_url': 'https://book.douban.com',
+    'movie_comments_url': 'https://movie.douban.com/subject/{}/comments',
+    'book_comments_url': 'https://book.douban.com/subject/{}/comments'
 }
 
 # 文本分析配置
