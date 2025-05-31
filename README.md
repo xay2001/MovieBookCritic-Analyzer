@@ -69,7 +69,7 @@ python main.py
 
 ```bash
 # 分析电影
-python main.py --type movie --name "肖申克的救赎" --max_comments 500
+python main.py --type movie --name "流浪地球" --max_comments 100
 
 # 分析图书
 python main.py --type book --name "三体" --max_comments 1000
